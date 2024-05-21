@@ -63,23 +63,21 @@ tabix.read.table.nochecknames <- function (tabixFile, tabixRange,
         } else {
             hdrLine <- header[length(header)]
             hdrLine <- sub("^#", "", hdrLine)
-            # colNames <- make.names(strsplit(hdrLine, "\t")[[1]])
             colNames <- strsplit(hdrLine, "\t")[[1]]
             if (length(colNames) > ncol(body)) {
                 colNames <- colNames[1:ncol(body)]
-            }
-            else if (length(colNames) < ncol(body)) {
+            } else if (length(colNames) < ncol(body)) {
                 tmpNames <- paste0("V", 1L:num.col)
                 tmpNames[1:length(colNames)] <- colNames
                 colNames <- tmpNames
             }
         }
         colnames(body) <- colNames
-    # Handling multi-allelic positions
+        
+        # Handling multi-allelic positions
         if ("ALT" %in% colnames(body)) {
             alt_alleles <- strsplit(body$ALT, ",")
-            max_alt <- max(sapply(alt_alleles, length))
-            new_rows <- do.call(rbind, lapply(seq_along(alt_alleles), function(i) {
+            body <- do.call(rbind, lapply(seq_len(nrow(body)), function(i) {
                 row <- body[i, ]
                 alts <- alt_alleles[[i]]
                 do.call(rbind, lapply(seq_along(alts), function(j) {
@@ -89,11 +87,11 @@ tabix.read.table.nochecknames <- function (tabixFile, tabixRange,
                     new_row
                 }))
             }))
-            body <- new_rows
         }
     }
     body
 }
+
 
 check.genotype <- function(geno.df, min.nb.ind.geno = 10) {
     apply(geno.df, 1, function(geno.snp) {
@@ -201,22 +199,28 @@ if (any(snps.to.keep == "PASS")) {
         }
     } else {
         INT <- paste0(opt$interaction, ":GT")
-        for (p in geno.df$pos) {
-            snp <- subset(geno.df, pos == p)
-            rec <- snp[, !colnames(snp)%in%subset.ids]
-            snp <- as.numeric(snp[, subset.ids])
-            Data <- data.frame(cov.df, "GT" = snp)
-            fm <- as.formula(paste("Y ~", paste0(c(colnames(Data), INT), collapse = "+")))
-            mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp), type = "II", transform = opt$transform, 
-                                    subset = c(opt$interaction, "GT", INT)),
-                              error = function(e) NULL)
-            if (is.null(mvfit)) {
-                warning(sprintf("SNP %s skipped",  subset(geno.df, pos == p)$variant))
-                next
-            }
-            out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
-        }
+        for (p in unique(geno.df$pos)) {
+    snp <- subset(geno.df, pos == p)
+    rec <- snp[, !colnames(snp) %in% subset.ids]
+    snp_values <- as.numeric(as.matrix(snp[, subset.ids]))
+    
+    if (opt$interaction == "none") {
+        mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, GT = snp_values), type = "I", subset = "GT", transform = opt$transform),
+                          error = function(e) NULL)
+    } else {
+        INT <- paste0(opt$interaction, ":GT")
+        Data <- data.frame(cov.df, GT = snp_values)
+        fm <- as.formula(paste("Y ~", paste0(c(colnames(Data), INT), collapse = "+")))
+        mvfit <- tryCatch(manta(fm, data = Data, type = "II", transform = opt$transform, subset = c(opt$interaction, "GT", INT)),
+                          error = function(e) NULL)
     }
+    
+    if (!is.null(mvfit)) {
+        out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
+    } else {
+        warning(sprintf("SNP %s skipped", subset(geno.df, pos == p)$variant))
+    }
+}
     fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
 } 
 
