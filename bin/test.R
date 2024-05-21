@@ -75,6 +75,22 @@ tabix.read.table.nochecknames <- function (tabixFile, tabixRange,
             }
         }
         colnames(body) <- colNames
+    # Handling multi-allelic positions
+        if ("ALT" %in% colnames(body)) {
+            alt_alleles <- strsplit(body$ALT, ",")
+            max_alt <- max(sapply(alt_alleles, length))
+            new_rows <- do.call(rbind, lapply(seq_along(alt_alleles), function(i) {
+                row <- body[i, ]
+                alts <- alt_alleles[[i]]
+                do.call(rbind, lapply(seq_along(alts), function(j) {
+                    new_row <- row
+                    new_row$ALT <- alts[j]
+                    new_row$variant <- paste0(new_row$variant, "_", j)
+                    new_row
+                }))
+            }))
+            body <- new_rows
+        }
     }
     body
 }
@@ -119,6 +135,20 @@ subset.ids <- rownames(pheno.df)
 
 cn <- c("chr", "pos", "variant", "REF", "ALT") 
 colnames(geno.df)[1:5] <- cn
+
+# Split multiallelic positions
+multi_allelic <- which(duplicated(geno.df[, c("chr", "pos")]))
+if (length(multi_allelic) > 0) {
+    geno.df <- geno.df[order(geno.df$pos), ]
+    multi_allelic <- which(duplicated(geno.df[, c("chr", "pos")], fromLast = TRUE))
+    for (i in multi_allelic) {
+        new_row <- geno.df[i, ]
+        new_row$variant <- paste0(new_row$variant, "_", 1:sum(geno.df$pos == new_row$pos))
+        geno.df <- rbind(geno.df, new_row)
+    }
+    geno.df <- geno.df[!duplicated(geno.df[, c("chr", "pos", "variant")]), ]
+}
+
 geno.df <- geno.df[, colnames(geno.df) %in% c(cn, subset.ids)]
 geno.df[, -c(1:5)] <- apply(geno.df[, -c(1:5)], 2, function(x){
     y <- gsub("([012.]/[012.]):.*","\\1", x)
