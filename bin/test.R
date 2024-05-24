@@ -157,61 +157,53 @@ if (any(snps.to.keep == "PASS")) {
     out.df <- c()
     Y <- as.matrix(pheno.df)
     if (opt$interaction == "none") {
-        for (i in 1:nrow(geno.df)) {
-        snp <- geno.df[i,] # Select the i-th row of geno.df, which represents a single SNP
-        rec <- snp[, !colnames(snp) %in% subset.ids] # Extract non-genotype columns (metadata)
-        snp_geno <- as.numeric(snp[, subset.ids]) # Convert genotype data to numeric
-        
-        # Perform the association analysis with error handling
-        mvfit <- tryCatch(
-          manta(Y ~ ., data = data.frame(cov.df, "GT" = snp_geno), type = "I", subset = "GT", transform = opt$transform),
-          error = function(e) NULL
-        )
-        
-        # Check if the model fitting was successful
-        if (is.null(mvfit)) {
-          warning(sprintf("SNP %s at position %s skipped", snp$variant, snp$pos)) # Issue a warning if skipped
-          next # Skip to the next iteration if there was an error
-        }
-        
-        # Append the results to out.df
-        out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1, 4:6]))
-      }
-    } else {
-    INT <- paste0(opt$interaction, ":GT")
-    unique_snp_combinations <- unique(geno.df[, c("pos", "variant")]) # Get unique combinations of pos and variant
-    
-    for (i in 1:nrow(unique_snp_combinations)) {
-        p <- unique_snp_combinations$pos[i]
-        v <- unique_snp_combinations$variant[i]
-        
-        snp <- subset(geno.df, pos == p & variant == v) # Filter by both pos and variant
-        if (nrow(snp) == 0) next # Skip if no such SNP exists (should not happen with unique combinations)
+        unique_snp_combinations <- unique(geno.df[, c("pos", "variant")]) # Get unique combinations of pos and variant
+        for (i in 1:nrow(unique_snp_combinations)) {
+            p <- unique_snp_combinations$pos[i]
+            v <- unique_snp_combinations$variant[i]
 
-        rec <- snp[, !colnames(snp) %in% subset.ids] # Extract non-genotype columns (metadata)
-        snp_values <- as.numeric(as.matrix(snp[, subset.ids])) # Convert genotype data to numeric
-        
-        if (opt$interaction == "none") {
+            snp <- subset(geno.df, pos == p & variant == v) # Filter by both pos and variant
+            if (nrow(snp) == 0) next # Skip if no such SNP exists (should not happen with unique combinations)
+
+            rec <- snp[, !colnames(snp) %in% subset.ids] # Extract non-genotype columns (metadata)
+            snp_values <- as.numeric(as.matrix(snp[, subset.ids])) # Convert genotype data to numeric
+
             mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, GT = snp_values), type = "I", subset = "GT", transform = opt$transform),
                               error = function(e) NULL)
-        } else {
+
+            if (!is.null(mvfit)) {
+                out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1, 4:6]))
+            } else {
+                warning(sprintf("SNP %s at position %s skipped", v, p))
+            }
+        }
+    } else {
+        unique_snp_combinations <- unique(geno.df[, c("pos", "variant")]) # Get unique combinations of pos and variant
+        for (i in 1:nrow(unique_snp_combinations)) {
+            p <- unique_snp_combinations$pos[i]
+            v <- unique_snp_combinations$variant[i]
+
+            snp <- subset(geno.df, pos == p & variant == v) # Filter by both pos and variant
+            if (nrow(snp) == 0) next # Skip if no such SNP exists (should not happen with unique combinations)
+
+            rec <- snp[, !colnames(snp) %in% subset.ids] # Extract non-genotype columns (metadata)
+            snp_values <- as.numeric(as.matrix(snp[, subset.ids])) # Convert genotype data to numeric
+
             INT <- paste0(opt$interaction, ":GT")
             Data <- data.frame(cov.df, GT = snp_values)
             fm <- as.formula(paste("Y ~", paste0(c(colnames(Data), INT), collapse = "+")))
             mvfit <- tryCatch(manta(fm, data = Data, type = "II", transform = opt$transform, subset = c(opt$interaction, "GT", INT)),
                               error = function(e) NULL)
-        }
-        
-        if (!is.null(mvfit)) {
-            out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
-        } else {
-            warning(sprintf("SNP %s at position %s skipped", v, p))
+
+            if (!is.null(mvfit)) {
+                out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
+            } else {
+                warning(sprintf("SNP %s at position %s skipped", v, p))
+            }
         }
     }
-  }
-
     fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
-} 
+}
 
 #### END
 
