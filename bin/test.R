@@ -158,8 +158,7 @@ if (any(snps.to.keep == "PASS")) {
         for (variant in geno.df$variant) {
             snp <- subset(geno.df, variant == variant)
             rec <- snp[, !colnames(snp)%in%subset.ids]
-            snp <- as.matrix(snp[, subset.ids], mode = "numeric")
-              
+            snp <- as.numeric(snp[, subset.ids]) 
             mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, "GT" = snp), type = "I", subset = "GT", transform = opt$transform),
                                 error = function(e) NULL)
             if (is.null(mvfit)) {
@@ -173,7 +172,7 @@ if (any(snps.to.keep == "PASS")) {
         for (variant in geno.df$variant) {
             snp <- subset(geno.df, variant == variant)
             rec <- snp[, !colnames(snp)%in%subset.ids]
-            snp <- as.matrix(snp[, subset.ids], mode = "numeric")
+            snp <- as.numeric(snp[, subset.ids])
             Data <- data.frame(cov.df, "GT" = snp)
             fm <- as.formula(paste("Y ~", paste0(c(colnames(Data), INT), collapse = "+")))
             mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp), type = "II", transform = opt$transform, 
