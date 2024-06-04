@@ -103,8 +103,8 @@ process split {
 
     script:
     """
-    bcftools query -f '%CHROM\t%POS\n' $vcf > positions
-    split -d -a 10 -l ${params.l} positions chunk
+    bcftools query -f '%CHROM\t%POS\t%ID\n' $vcf > variants
+    split -d -a 10 -l ${params.l} variants chunk
     """
 }
 
