@@ -112,6 +112,7 @@ if (is.null(pheno.f) || is.null(geno.f) || is.null(cov.f) || is.null(region) ||
 
 pheno.df <- data.frame(fread(pheno.f, header = TRUE, sep = "\t"), row.names = 1)
 cov.df <- data.frame(fread(cov.f, header = TRUE, sep = "\t"), row.names = 1)
+cat("Tabix Range: ", region, "\n")  #print the region
 geno.df <- tabix.read.table.nochecknames(geno.f, region)
 
 subset.ids <- rownames(pheno.df)
