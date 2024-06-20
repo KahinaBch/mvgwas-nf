@@ -151,20 +151,13 @@ process mvgwas {
     if [[ \$(cut -f1 $chunk | sort | uniq -c | wc -l) -ge 2 ]]; then
         k=1
         cut -f1 $chunk | sort | uniq | while read chr; do
-        start=\$(grep -P "^${chr}\t" ${chunk} | head -1 | cut -f2)
-        end=\$(grep -P "^${chr}\t" ${chunk} | tail -1 | cut -f2)
-        region="\${chr}:\${start}-\${end}"
-        echo "Region: \$region"
+        region=\$(paste <(grep -P "^\$chr\t" $chunk | head -1) <(grep -P "^\$chr\t" $chunk | tail -1 | cut -f2) | sed 's/\t/:/' | sed 's/\t/-/')
         test.R --phenotypes $pheno --covariates $cov --genotypes $vcf --region "\$region" --output sstats.\$k.tmp --min_nb_ind_geno ${params.ng} -t ${params.t} -i ${params.i} --verbose 
         ((k++))
     done
     cat sstats.*.tmp > sstats.\${chunknb}.txt
     else
-        chr=\$(cut -f1 ${chunk} | head -1)
-        start=\$(head -1 ${chunk} | cut -f2)
-        end=\$(tail -1 ${chunk} | cut -f2)
-        region="\${chr}:\${start}-\${end}"
-        echo "Region: \$region"
+        region=\$(paste <(head -1 $chunk) <(tail -1 $chunk | cut -f2) | sed 's/\t/:/' | sed 's/\t/-/')
         test.R --phenotypes $pheno --covariates $cov --genotypes $vcf --region "\$region" --output sstats.\${chunknb}.txt --min_nb_ind_geno ${params.ng} -t ${params.t} -i ${params.i} --verbose
     fi
     """
