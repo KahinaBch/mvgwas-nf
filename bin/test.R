@@ -193,6 +193,6 @@ if (any(snps.to.keep == "PASS")) {
     }
     fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
 } 
-
+save.image("/nfs/users/rg/kbaouche/data/ADNI/Data_for_Manta/workspace_image_Test.RData")
 #### END
 
