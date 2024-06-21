@@ -200,7 +200,7 @@ if (any(snps.to.keep == "PASS")) {
             Data <- data.frame(cov.df, "GT" = snp_numeric)
           
             fm <- as.formula(paste("Y ~", paste0(c(colnames(Data), INT), collapse = "+")))
-            mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp), type = "II", transform = opt$transform, 
+            mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp_numeric), type = "II", transform = opt$transform, 
                                     subset = c(opt$interaction, "GT", INT)),
                               error = function(e) NULL)
             if (is.null(mvfit)) {
