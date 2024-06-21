@@ -145,7 +145,7 @@ fwrite(pheno.df, file = out_pheno.f, row.names = TRUE, quote = FALSE, sep = "\t"
 fwrite(cov.df, file = out_cov.f, row.names = TRUE, quote = FALSE, sep = "\t")
 
 # Save the workspace
-save.image("workspace_image.RData")
+save.image("/nfs/users/rg/kbaouche/data/ADNI/Data_for_Manta/workspace_image.RData")
 
 #### END
 
