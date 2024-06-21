@@ -210,7 +210,20 @@ if (any(snps.to.keep == "PASS")) {
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
         }
     }
-    fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
-} 
+                              
+    # Check if out.df is not empty before writing
+                              
+    if (nrow(out.df) > 0) {
+      
+        fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+      
+    } else {
+      
+        warning("No valid SNPs passed the filters. No output written.")
+    }
+} else {
+  
+    warning("No SNPs passed the filters. No output written.")
+}
 
 #### END
