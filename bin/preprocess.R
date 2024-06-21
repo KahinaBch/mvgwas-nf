@@ -144,5 +144,8 @@ if (ncol(cov.df) > 1) {
 fwrite(pheno.df, file = out_pheno.f, row.names = TRUE, quote = FALSE, sep = "\t")
 fwrite(cov.df, file = out_cov.f, row.names = TRUE, quote = FALSE, sep = "\t")
 
+# Save the workspace
+save.image("workspace_image.RData")
+
 #### END
 
