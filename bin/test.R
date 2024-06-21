@@ -163,7 +163,7 @@ if (any(snps.to.keep == "PASS")) {
               
             mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, "GT" = snp), type = "I", subset = "GT", transform = opt$transform),
                                 error = function(e) NULL)
-            res_manova <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["snp", 6]}, 
+            res_manova <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["GT", 6]}, 
                                          error = function(e){return(NA)} )
             if (is.null(mvfit)) {
                 warning(sprintf("SNP %s skipped",  subset(geno.df, pos == p)$variant))
@@ -182,7 +182,7 @@ if (any(snps.to.keep == "PASS")) {
             mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp), type = "II", transform = opt$transform, 
                                     subset = c(opt$interaction, "GT", INT)),
                               error = function(e) NULL)
-            res_manova[snp] <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["snp", 6]}, 
+            res_manova[snp] <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["GT", 6]}, 
                                          error = function(e){return(NA)} )
             if (is.null(mvfit)) {
                 warning(sprintf("SNP %s skipped",  subset(geno.df, pos == p)$variant))
