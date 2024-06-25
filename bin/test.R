@@ -95,6 +95,9 @@ check.genotype <- function(geno.df, min.nb.ind.geno = 10) {
     })
 }
 
+print("Structure of geno.df after conversion:")
+print(str(geno.df))  # Debugging: Print the structure of geno.df
+
 ## 2. Input files
   
 pheno.f <- opt$phenotypes   
