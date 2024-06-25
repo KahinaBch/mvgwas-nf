@@ -159,20 +159,9 @@ if (any(snps.to.keep == "PASS")) {
         for (variant in geno.df$variant) {
             snp <- subset(geno.df, variant == variant)
             rec <- snp[, !colnames(snp)%in%subset.ids]
-             snp_subset <- snp[, subset.ids]
-            
-            # Check if snp_subset is a list and convert it to a matrix/data frame
-            if (is.list(snp_subset)) {
-                snp_subset <- do.call(cbind, snp_subset)
-            }
-            
-            # Convert to character first if necessary, then to numeric
-            if (is.factor(snp_subset)) {
-                snp_subset <- as.character(snp_subset)
-            }
-            snp_numeric <- as.numeric(snp_subset)
+            snp <- as.numeric(snp[, subset.ids])
           
-            mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, "GT" = snp_numeric), type = "I", subset = "GT", transform = opt$transform),
+            mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, "GT" = snp), type = "I", subset = "GT", transform = opt$transform),
                                 error = function(e) NULL)
             if (is.null(mvfit)) {
                 warning(sprintf("SNP %s skipped",  variant))
@@ -186,21 +175,12 @@ if (any(snps.to.keep == "PASS")) {
             snp <- subset(geno.df, variant == variant)
             rec <- snp[, !colnames(snp)%in%subset.ids]
           
-            # Check if snp_subset is a list and convert it to a matrix/data frame
-            if (is.list(snp_subset)) {
-                snp_subset <- do.call(cbind, snp_subset)
-            }
+            snp <- as.numeric(snp[, subset.ids])
             
-            # Convert to character first if necessary, then to numeric
-            if (is.factor(snp_subset)) {
-                snp_subset <- as.character(snp_subset)
-            }
-            snp_numeric <- as.numeric(snp_subset)
-            
-            Data <- data.frame(cov.df, "GT" = snp_numeric)
+            Data <- data.frame(cov.df, "GT" = snp)
           
             fm <- as.formula(paste("Y ~", paste0(c(colnames(Data), INT), collapse = "+")))
-            mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp_numeric), type = "II", transform = opt$transform, 
+            mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp), type = "II", transform = opt$transform, 
                                     subset = c(opt$interaction, "GT", INT)),
                               error = function(e) NULL)
             if (is.null(mvfit)) {
