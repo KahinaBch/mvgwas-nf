@@ -156,8 +156,8 @@ if (any(snps.to.keep == "PASS")) {
     out.df <- c()
     Y <- as.matrix(pheno.df)
     if (opt$interaction == "none") {
-        for (variant in geno.df$variant) {
-            snp <- subset(geno.df, variant == variant)
+        for (var in geno.df$variant) {
+            snp <- subset(geno.df, variant == var)
             rec <- snp[, !colnames(snp)%in%subset.ids]
             snp <- as.numeric(snp[, subset.ids])
           
@@ -171,8 +171,8 @@ if (any(snps.to.keep == "PASS")) {
         }
     } else {
         INT <- paste0(opt$interaction, ":GT")
-        for (variant in geno.df$variant) {
-            snp <- subset(geno.df, variant == variant)
+        for (var in geno.df$variant) {
+            snp <- subset(geno.df, variant == var)
             rec <- snp[, !colnames(snp)%in%subset.ids]
           
             snp <- as.numeric(snp[, subset.ids])
@@ -190,5 +190,5 @@ if (any(snps.to.keep == "PASS")) {
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
         }
     }
-
+}
 #### END
