@@ -163,11 +163,13 @@ if (any(snps.to.keep == "PASS")) {
           
             mvfit <- tryCatch(manta(Y ~ ., data = data.frame(cov.df, "GT" = snp), type = "I", subset = "GT", transform = opt$transform),
                                 error = function(e) NULL)
+            res_manova <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["GT", 6]}, 
+                                         error = function(e){return(NA)} )
             if (is.null(mvfit)) {
                 warning(sprintf("SNP %s skipped",  variant))
                 next
             }
-            out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1, 4:6]))
+            out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1, 4:6],res_manova))
         }
     } else {
         INT <- paste0(opt$interaction, ":GT")
@@ -183,12 +185,17 @@ if (any(snps.to.keep == "PASS")) {
             mvfit <- tryCatch(manta(fm,  data = data.frame(cov.df, "GT" = snp), type = "II", transform = opt$transform, 
                                     subset = c(opt$interaction, "GT", INT)),
                               error = function(e) NULL)
+            res_manova <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["GT", 6]}, 
+                                         error = function(e){return(NA)} )
             if (is.null(mvfit)) {
                 warning(sprintf("SNP %s skipped",  variant))
                 next
             }
-            out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6]))
+            out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6],res_manova))
         }
     }
+  # Rename the columns
+colnames(out.df) <- c("CHR", "POS", "ID", "REF", "ALT", "F_manta", "R2_manta", "P_manta", "P_manova")
+fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = TRUE, sep = "\t")
 }
 #### END
