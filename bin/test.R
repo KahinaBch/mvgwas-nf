@@ -194,6 +194,6 @@ if (any(snps.to.keep == "PASS")) {
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6],res_manova))
         }
     }
-fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = TRUE, sep = "\t")
+fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
 }
 #### END
