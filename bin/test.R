@@ -194,8 +194,6 @@ if (any(snps.to.keep == "PASS")) {
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6],res_manova))
         }
     }
-  # Rename the columns
-colnames(out.df) <- c("CHR", "POS", "ID", "REF", "ALT", "F_manta", "R2_manta", "P_manta", "P_manova")
 fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = TRUE, sep = "\t")
 }
 #### END
