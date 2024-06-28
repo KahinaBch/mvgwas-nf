@@ -115,8 +115,8 @@ if (opt$verbose) {
 }
 
 cov.na <- apply(cov.df, 1, function(x){any(is.na(x))})
-if (sum(cov.na) / nrow(cov.df) > 0.05) {
-    stop("More than 5% of the individuals contain NA values for at least one covariate")  
+if (sum(cov.na) / nrow(cov.df) > 0.09) {
+    stop("More than 9% of the individuals contain NA values for at least one covariate")  
 }
 
 multiclass <- apply(cov.df, 2, function(x){length(table(x)) > 1})
