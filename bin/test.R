@@ -84,8 +84,8 @@ check.genotype <- function(geno.df, min.nb.ind.geno = 10) {
             return("Missing genotype in > 5% individuals")
         }
         geno.snp.t <- table(geno.snp[!is.na(geno.snp)])
-        if (length(geno.snp.t) < 3) {
-            return("One or two genotype groups")                    
+        if (length(geno.snp.t) < 1) {
+            return("One genotype groups")                    
         }
         if (sum(geno.snp.t >= min.nb.ind.geno) < length(geno.snp.t)) {
             return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
