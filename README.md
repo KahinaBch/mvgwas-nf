@@ -29,14 +29,14 @@ The pipeline uses [Nextflow](http://www.nextflow.io) as the execution backend. P
 
 2. Make a test run:
     ```
-    nextflow run dgarrimar/mvgwas-nf -with-docker
+    nextflow run KahinaBch/mvgwas-nf -with-docker
     ```
 
 **Notes**: move the `nextflow` executable to a directory in your `$PATH`. Set `-with-singularity` to use Singularity instead of Docker.
 
 (*) Alternatively you can clone this repository:
 ```
-git clone https://github.com/dgarrimar/mvgwas-nf
+git clone https://github.com/KahinaBch/mvgwas-nf
 cd mvgwas-nf
 nextflow run mvgwas.nf -with-docker
 ```
@@ -58,7 +58,7 @@ Launching `mvgwas.nf` [amazing_roentgen] - revision: 56125073b7
 
 mvgwas-nf: A pipeline for multivariate Genome-Wide Association Studies
 ==============================================================================================
-Performs multi-trait GWAS using using MANTA (https://github.com/dgarrimar/manta)
+Performs multi-trait GWAS using using MANTA (https://github.com/KahinaBch/manta)
 
 Usage:
 nextflow run mvgwas.nf [options]
