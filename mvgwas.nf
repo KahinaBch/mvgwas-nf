@@ -93,14 +93,12 @@ log.info ''
 process split {
  
     input:
-
-    file(vcf) from file(params.geno)
-    file(index) from file("${params.geno}.tbi")    
+    path vcf
+    path index
 
     output:
+    path "chunk*"
     
-    file("chunk*") into chunks_ch    
-
     script:
     """
     bcftools query -f '%CHROM\t%POS\n' $vcf > positions
@@ -114,14 +112,12 @@ process split {
 process preprocess {
 
     input:
-
-    file(pheno) from file(params.pheno)
-    file(cov) from file(params.cov)
-    file(vcf) from file(params.geno)
+    path pheno
+    path cov
+    path vcf
 
     output:
-
-    tuple file("pheno_preproc.tsv.gz"), file("cov_preproc.tsv.gz") into preproc_ch
+    tuple path("pheno_preproc.tsv.gz"), path("cov_preproc.tsv.gz")
     
     script:
     """
@@ -135,15 +131,13 @@ process preprocess {
 process mvgwas {
 
     input:
-
-    tuple file(pheno), file(cov) from preproc_ch
-    file(vcf) from file(params.geno)
-    file(index) from file("${params.geno}.tbi")
-    each file(chunk) from chunks_ch
+    tuple path(pheno), path(cov)
+    path vcf
+    path index
+    each path(chunk)
 
     output:
-
-    file('sstats.*.txt') optional true into sstats_ch
+    path 'sstats.*.txt', optional: true
 
     script:
     """
@@ -163,8 +157,6 @@ process mvgwas {
     """
 }
 
-sstats_ch.collectFile(name: "${params.out}", sort: { it.name }).set{pub_ch}
-
 
 // Summary stats
 
@@ -173,10 +165,10 @@ process end {
     publishDir "${params.dir}", mode: 'copy'     
 
     input:
-    file(out) from pub_ch
+    path out
 
     output:
-    file(out) into end_ch
+    path out
 
     script:
     if (params.i == 'none')
@@ -187,5 +179,32 @@ process end {
     """
     sed -i "1 s/^/CHR\tPOS\tID\tREF\tALT\tF_manta($params.i)\tF_manta(GT)\tF_manta(${params.i}:GT)\tR2_manta($params.i)\tR2_manta(GT)\tR2_manta(${params.i}:GT)\tP_manta($params.i)\tP_manta(GT)\tP_manta(${params.i}:GT)\tP_manova\\n/" ${out}
     """
+}
+
+
+// Main workflow
+
+workflow {
+    
+    // Input channels
+    vcf_ch = Channel.fromPath(params.geno)
+    index_ch = Channel.fromPath("${params.geno}.tbi")
+    pheno_ch = Channel.fromPath(params.pheno)
+    cov_ch = Channel.fromPath(params.cov)
+    
+    // Split VCF into chunks
+    chunks_ch = split(vcf_ch, index_ch)
+    
+    // Preprocess phenotypes and covariates
+    preproc_ch = preprocess(pheno_ch, cov_ch, vcf_ch)
+    
+    // Run GWAS on each chunk
+    sstats_ch = mvgwas(preproc_ch, vcf_ch, index_ch, chunks_ch.flatten())
+    
+    // Collect all results
+    collected_ch = sstats_ch.collectFile(name: "${params.out}", sort: { it.name })
+    
+    // Final processing
+    end(collected_ch)
 }
 
