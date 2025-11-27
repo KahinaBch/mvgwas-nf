@@ -1,6 +1,6 @@
 # mvgwas-nf
 
-[![nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.04.1-blue.svg)](http://nextflow.io)
+[![nextflow](https://img.shields.io/badge/nextflow-%E2%89%A522.04.0%2B-blue.svg)](http://nextflow.io)
 [![CI-checks](https://github.com/dgarrimar/mvgwas-nf/actions/workflows/ci.yaml/badge.svg)](https://github.com/dgarrimar/mvgwas-nf/actions/workflows/ci.yaml)
 
 A pipeline for multi-trait genome-wide association studies (GWAS) using [MANTA](https://github.com/dgarrimar/manta).
@@ -41,8 +41,8 @@ cd mvgwas-nf
 nextflow run mvgwas.nf -with-docker
 ```
 
-**Important**: Since release `22.12.0-edge`, DSL1 is not further supported in Nextflow. Until `mvgwas-nf` is migrated to DSL2, the pipeline should be run using an older Nextflow release.
-This can be done using `NXF_VER` before Nextflow commands, e.g. `NXF_VER=22.04.0 nextflow run dgarrimar/mvgwas-nf -with-docker`.
+**Important**: This pipeline has been updated to DSL2 syntax and is compatible with newer Nextflow versions. However, if you are using Java 8, you need to use Nextflow version 22.04.0 or compatible versions that support Java 8.
+This can be done using `NXF_VER` before Nextflow commands, e.g. `NXF_VER=22.04.0 nextflow run mvgwas.nf -with-docker`.
 
 ## Pipeline usage
 
