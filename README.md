@@ -5,11 +5,16 @@
 
 A pipeline for multi-trait genome-wide association studies (GWAS) using [MANTA](https://github.com/dgarrimar/manta).
 
+> **Note**: This is a fork of [dgarrimar/mvgwas-nf](https://github.com/dgarrimar/mvgwas-nf) with the following enhancements:
+> - **DSL2 conversion**: Updated from legacy DSL1 to modern DSL2 syntax for compatibility with Nextflow ≥22.04.0
+> - **MANOVA p-value**: Added classical MANOVA p-value computation alongside MANTA statistics for comparison
+> - **Java 8 compatibility**: Tested and documented for HPC clusters running Java 8
+
 The pipeline performs the following analysis steps:
 
 * Split genotype file 
 * Preprocess phenotype and covariate data
-* Test for association between phenotypes and genetic variants
+* Test for association between phenotypes and genetic variants using **both MANTA and MANOVA**
 * Collect summary statistics
 
 The pipeline uses [Nextflow](http://www.nextflow.io) as the execution backend. Please check [Nextflow documentation](http://www.nextflow.io/docs/latest/index.html) for more information.
@@ -101,11 +106,32 @@ An output text file containing the multi-trait GWAS summary statistics (default:
 * `ID`: variant ID
 * `REF`: reference allele
 * `ALT`: alternative allele
-* `F`: pseudo-F statistic
-* `R2`: fraction of variance explained by the variant
-* `P`: P-value
+* `F_manta`: pseudo-F statistic from MANTA
+* `R2_manta`: fraction of variance explained by the variant (MANTA)
+* `P_manta`: P-value from MANTA (non-parametric, permutation-based)
+* `P_manova`: P-value from classical MANOVA (Pillai's trace)
+
+When using the interaction option (`--i`), additional columns are provided for the covariate, genotype, and interaction effects.
 
 The output folder and file names can be modified with the `--dir` and `--out` parameters, respectively.
+
+## Differences from Original Pipeline
+
+This fork extends the original [dgarrimar/mvgwas-nf](https://github.com/dgarrimar/mvgwas-nf) with:
+
+| Feature | Original | This Fork |
+|---------|----------|-----------|
+| Nextflow syntax | DSL1 (deprecated) | DSL2 (modern) |
+| Statistical tests | MANTA only | MANTA + MANOVA |
+| Output columns | F, R2, P | F_manta, R2_manta, P_manta, P_manova |
+| Java 8 support | Limited docs | Fully documented |
+
+### Why add MANOVA?
+
+MANTA uses a fast non-parametric permutation-based approach, while classical MANOVA uses Pillai's trace statistic with parametric assumptions. Including both allows:
+- Comparison of parametric vs non-parametric results
+- Validation of significant associations
+- Assessment of the impact of distributional assumptions
 
 ## Cite mvgwas-nf
 
