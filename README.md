@@ -29,20 +29,20 @@ The pipeline uses [Nextflow](http://www.nextflow.io) as the execution backend. P
 
 2. Make a test run:
     ```
-    nextflow run dgarrimar/mvgwas-nf -with-docker
+    nextflow run KahinaBch/mvgwas-nf -with-docker
     ```
 
 **Notes**: move the `nextflow` executable to a directory in your `$PATH`. Set `-with-singularity` to use Singularity instead of Docker.
 
 (*) Alternatively you can clone this repository:
 ```
-git clone https://github.com/dgarrimar/mvgwas-nf
+git clone https://github.com/KahinaBch/mvgwas-nf
 cd mvgwas-nf
 nextflow run mvgwas.nf -with-docker
 ```
 
 **Important**: Since release `22.12.0-edge`, DSL1 is not further supported in Nextflow. Until `mvgwas-nf` is migrated to DSL2, the pipeline should be run using an older Nextflow release.
-This can be done using `NXF_VER` before Nextflow commands, e.g. `NXF_VER=22.04.0 nextflow run dgarrimar/mvgwas-nf -with-docker`.
+This can be done using `NXF_VER` before Nextflow commands, e.g. `NXF_VER=22.04.0 nextflow run KahinaBch/mvgwas-nf -with-docker`.
 
 ## Pipeline usage
 
