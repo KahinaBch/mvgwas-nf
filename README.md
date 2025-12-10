@@ -63,7 +63,7 @@ Launching `mvgwas.nf` [amazing_roentgen] - revision: 56125073b7
 
 mvgwas-nf: A pipeline for multivariate Genome-Wide Association Studies
 ==============================================================================================
-Performs multi-trait GWAS using using MANTA (https://github.com/KahinaBch/manta)
+Performs multi-trait GWAS using using MANTA (https://github.com/dgarrimar/manta)
 
 Usage:
 nextflow run mvgwas.nf [options]
