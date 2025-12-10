@@ -166,7 +166,7 @@ if (any(snps.to.keep == "PASS")) {
             res_manova <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["GT", 6]}, 
                                          error = function(e){return(NA)} )
             if (is.null(mvfit)) {
-                warning(sprintf("SNP %s skipped",  variant))
+                warning(sprintf("SNP %s skipped",  var))
                 next
             }
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1, 4:6],res_manova))
@@ -188,7 +188,7 @@ if (any(snps.to.keep == "PASS")) {
             res_manova <- tryCatch( {summary(manova(Y ~ ., data.frame(cov.df, "GT" = snp)))$stats["GT", 6]}, 
                                          error = function(e){return(NA)} )
             if (is.null(mvfit)) {
-                warning(sprintf("SNP %s skipped",  variant))
+                warning(sprintf("SNP %s skipped",  var))
                 next
             }
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6],res_manova))
