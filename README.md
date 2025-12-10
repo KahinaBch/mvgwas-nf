@@ -58,26 +58,23 @@ nextflow run mvgwas.nf --help
 ```
 
 ```
-N E X T F L O W  ~  version 20.04.1
-Launching `mvgwas.nf` [amazing_roentgen] - revision: 56125073b7
-
+ N E X T F L O W   ~  version 25.10.2
+Launching `mvgwas.nf` [infallible_kalam] DSL2 - revision: 827d801bbd
 mvgwas-nf: A pipeline for multivariate Genome-Wide Association Studies
 ==============================================================================================
 Performs multi-trait GWAS using using MANTA (https://github.com/dgarrimar/manta)
-
-Usage:
-nextflow run mvgwas.nf [options]
-
+Usage: 
+    nextflow run mvgwas.nf [options]
 Parameters:
---pheno PHENOTYPES          phenotype file
---geno GENOTYPES            indexed genotype VCF file
---cov COVARIATES            covariate file
---l VARIANTS/CHUNK          variants tested per chunk (default: 10000)
---t TRANSFOMATION           phenotype transformation: none, sqrt, log (default: none)
---i INTERACTION             test for interaction with a covariate: none, <covariate> (default: none)
---ng INDIVIDUALS/GENOTYPE   minimum number of individuals per genotype group (default: 10)
---dir DIRECTORY             output directory (default: result)
---out OUTPUT                output file (default: mvgwas.tsv)
+ --pheno PHENOTYPES          phenotype file
+ --geno GENOTYPES            indexed genotype VCF file
+ --cov COVARIATES            covariate file
+ --l VARIANTS/CHUNK          variants tested per chunk (default: 500)
+ --t TRANSFOMATION           phenotype transformation: none, sqrt, log (default: none)
+ --i INTERACTION             test for interaction with a covariate: none, <covariate> (default: none)
+ --ng INDIVIDUALS/GENOTYPE   minimum number of individuals per genotype group (default: 10)
+ --dir DIRECTORY             output directory (default: result)
+ --out OUTPUT                output file (default: mvgwas.tsv)
 ```
 
 ## Input files and format
