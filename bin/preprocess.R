@@ -54,7 +54,7 @@ rownames(pheno.df) <- as.character(pheno.df$ID)
 rownames(cov.df) <- as.character(cov.df$ID)
 pheno.df$ID <- cov.df$ID <- NULL
 
-geno.df <- fread(cmd = sprintf("zcat %s | head -n 10000", geno.f), skip = "#CHROM", nrows = 1,
+geno.df <- fread(cmd = sprintf("gunzip -c %s | head -n 10000", geno.f), skip = "#CHROM", nrows = 1,
                  data.table = FALSE, header = TRUE, check.names = FALSE)
 
 subset.ids <- Reduce(intersect, list(colnames(geno.df),
@@ -141,8 +141,36 @@ if (ncol(cov.df) > 1) {
 
 ## 5. Write pre-processed phenotypes and covariates
 
-fwrite(pheno.df, file = out_pheno.f, row.names = TRUE, quote = FALSE, sep = "\t")
-fwrite(cov.df, file = out_cov.f, row.names = TRUE, quote = FALSE, sep = "\t")
+# Check if compression is requested based on file extension
+compress_pheno <- grepl("\\.gz$", out_pheno.f)
+compress_cov <- grepl("\\.gz$", out_cov.f)
+
+# Write files - fwrite will handle .gz extension if zlib is available, otherwise write uncompressed
+tryCatch({
+    fwrite(pheno.df, file = out_pheno.f, row.names = TRUE, quote = FALSE, sep = "\t")
+}, error = function(e) {
+    # If compression fails, write uncompressed and compress manually with gzip
+    if (compress_pheno) {
+        temp_file <- sub("\\.gz$", "", out_pheno.f)
+        fwrite(pheno.df, file = temp_file, row.names = TRUE, quote = FALSE, sep = "\t")
+        system(paste("gzip -f", temp_file))
+    } else {
+        stop(e)
+    }
+})
+
+tryCatch({
+    fwrite(cov.df, file = out_cov.f, row.names = TRUE, quote = FALSE, sep = "\t")
+}, error = function(e) {
+    # If compression fails, write uncompressed and compress manually with gzip
+    if (compress_cov) {
+        temp_file <- sub("\\.gz$", "", out_cov.f)
+        fwrite(cov.df, file = temp_file, row.names = TRUE, quote = FALSE, sep = "\t")
+        system(paste("gzip -f", temp_file))
+    } else {
+        stop(e)
+    }
+})
 
 #### END
 

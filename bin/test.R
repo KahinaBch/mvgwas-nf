@@ -194,6 +194,12 @@ if (any(snps.to.keep == "PASS")) {
             out.df <- rbind(out.df, c(t(rec), mvfit$aov.tab[1:3, 4:6],res_manova))
         }
     }
+# Convert to data frame if not empty, otherwise create empty data frame
+if (length(out.df) > 0 && is.matrix(out.df)) {
+    out.df <- as.data.frame(out.df)
+} else if (length(out.df) == 0) {
+    out.df <- data.frame()
+}
 fwrite(out.df, file = out.f, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
 }
 #### END
