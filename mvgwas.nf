@@ -173,11 +173,11 @@ process end {
     script:
     if (params.i == 'none')
     """
-    sed -i "1 s/^/CHR\tPOS\tID\tREF\tALT\tF_manta\tR2_manta\tP_manta\tP_manova\\n/" ${out}
+    sed -i '' "1 s/^/CHR\tPOS\tID\tREF\tALT\tF_manta\tR2_manta\tP_manta\tP_manova\\n/" ${out}
     """
     else
     """
-    sed -i "1 s/^/CHR\tPOS\tID\tREF\tALT\tF_manta($params.i)\tF_manta(GT)\tF_manta(${params.i}:GT)\tR2_manta($params.i)\tR2_manta(GT)\tR2_manta(${params.i}:GT)\tP_manta($params.i)\tP_manta(GT)\tP_manta(${params.i}:GT)\tP_manova\\n/" ${out}
+    sed -i '' "1 s/^/CHR\tPOS\tID\tREF\tALT\tF_manta($params.i)\tF_manta(GT)\tF_manta(${params.i}:GT)\tR2_manta($params.i)\tR2_manta(GT)\tR2_manta(${params.i}:GT)\tP_manta($params.i)\tP_manta(GT)\tP_manta(${params.i}:GT)\tP_manova\\n/" ${out}
     """
 }
 
